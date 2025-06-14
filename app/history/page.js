@@ -48,7 +48,7 @@ export default function UrlsPage() {
               <p>
                 Shortened URL:{" "}
                 <Link href={`/s/${url.shortenedUrl}`} className="text-green-500 ">
-                  http://localhost:3000/s/{url.shortenedUrl}
+                  {url.shortenedUrl}
                 </Link>
               </p>
             </li>
