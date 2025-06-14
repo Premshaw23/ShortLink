@@ -36,7 +36,7 @@ export default function Footer() {
             Contact
           </Link>
           <Link
-            href="/github"
+            href="https://github.com/Premshaw23/ShortLink"
             className="text-purple-300 hover:text-white transition"
           >
             GitHub

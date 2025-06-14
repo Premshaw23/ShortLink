@@ -35,7 +35,7 @@ const Navbar = () => {
               History
             </button>
           </Link>
-          <Link href="/s/github">
+          <Link href="https://github.com/Premshaw23/ShortLink">
             <button className="bg-purple-500 rounded-lg shadow-md px-4 py-2 font-bold hover:bg-purple-600 transition">
               GitHub
             </button>

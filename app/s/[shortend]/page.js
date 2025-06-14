@@ -1,26 +1,23 @@
 import { redirect } from "next/navigation";
 import connectDb from "@/lib/mongodb";
-import Url from "@/models/Url";
-// This will handle the redirect when someone visits a shortened URL
+
 export async function generateMetadata({ params }) {
-  const { shortend } = await params;
-  // console.log(params);
+  const { shortend } = params;
+
   // Connect to the database
-  await connectDb();
-  console.log("done");
+  const db = await connectDb();
+  const urls = db.collection("urls");
 
   // Find the URL corresponding to the shortened identifier
-  const url = await Url.findOne({ shortenedUrl: shortend });
-  console.log(url);
+  const url = await urls.findOne({ shortenedUrl: shortend });
+
   if (url) {
-    // Redirect to the original URL if found
     return redirect(url.originalUrl);
   } else {
-    // Handle case where shortened URL doesn't exist
-    return redirect(process.env.BASE_URL);
+    return redirect(process.env.BASE_URL); // fallback if not found
   }
 }
 
 export default function ShortenedPage() {
-  return null; // No need to render anything as the redirection happens in `generateMetadata`
+  return null; // Redirect happens in metadata
 }

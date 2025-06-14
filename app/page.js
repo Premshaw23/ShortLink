@@ -30,7 +30,7 @@ export default function Home() {
                 Try Now
               </button>
             </Link>
-            <Link href="/s/github">
+            <Link href="https://github.com/Premshaw23/ShortLink">
               <button className="bg-white border border-purple-600 text-purple-600 px-8 py-3 rounded-lg shadow-md hover:bg-purple-100 transition">
                 GitHub
               </button>
