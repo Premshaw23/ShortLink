@@ -1,23 +1,28 @@
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import connectDb from "@/lib/mongodb";
 
-export async function generateMetadata({ params }) {
-  const { shortend } = params;
+export default async function ShortenedPage({ params }) {
+  const { shortend } = await params;
 
-  // Connect to the database
   const db = await connectDb();
   const urls = db.collection("urls");
 
-  // Find the URL corresponding to the shortened identifier
   const url = await urls.findOne({ shortenedUrl: shortend });
 
-  if (url) {
-    return redirect(url.originalUrl);
-  } else {
-    return redirect(process.env.BASE_URL); // fallback if not found
+  if (!url) {
+    notFound(); // Custom 404 if not found
   }
-}
 
-export default function ShortenedPage() {
-  return null; // Redirect happens in metadata
+  const now = new Date();
+
+  // Check expiration
+  if (url.expiresAt && url.expiresAt < now) {
+    redirect("/expired"); // Optional: create an "expired" info page
+  }
+
+  // Track click
+  await urls.updateOne({ shortenedUrl: shortend }, { $inc: { clicks: 1 } });
+
+  // Redirect to original URL
+  redirect(url.originalUrl);
 }

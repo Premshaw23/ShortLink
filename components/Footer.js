@@ -46,7 +46,7 @@ export default function Footer() {
 
       {/* Footer Bottom Section */}
       <div className="border-t border-purple-600 mt-8 pt-4 text-center text-sm text-purple-400">
-        © {new Date().getFullYear()} FundFlick. All rights reserved.
+        © {new Date().getFullYear()} ShortLink. All rights reserved.
       </div>
     </footer>
   );

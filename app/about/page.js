@@ -1,55 +1,62 @@
 import React from "react";
+import Link from "next/link";
 
 const AboutPage = () => {
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg my-10">
-      <h1 className="text-4xl font-bold text-center text-purple-600 mb-6">
-        About Us
-      </h1>
+    <main className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 py-12 px-4">
+      <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-8 md:p-12">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center text-purple-600 mb-10">
+          About 
+        </h1>
 
-      <div className="space-y-6">
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            Our Mission
-          </h2>
-          <p className="text-lg text-gray-800">
-            At ShortLink, our mission is to provide a simple and reliable URL
-            shortening service that respects your privacy. We believe that
-            sharing links should be easy, quick, and secure. With no unnecessary
-            sign-ups or tracking, we aim to deliver the best URL shortening
-            experience for everyone.
-          </p>
-        </section>
+        <div className="space-y-10 text-gray-800 text-lg leading-relaxed">
+          {/* Mission */}
+          <section>
+            <h2 className="text-2xl font-bold text-purple-700 mb-4">
+              🌟 Our Mission
+            </h2>
+            <p>
+              At <strong>ShortLink</strong>, our goal is to make link shortening
+              fast, private, and hassle-free. We believe in delivering a smooth
+              experience without invading your privacy. No tracking. No
+              sign-ups. Just links—simplified.
+            </p>
+          </section>
 
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            Why Choose Us?
-          </h2>
-          <ul className="list-disc pl-5 text-lg text-gray-800 space-y-2">
-            <li>Fast and reliable URL shortening</li>
-            <li>Customizable short links with optional alias</li>
-            <li>No unnecessary tracking or sign-ups required</li>
-            <li>Simple, clean, and user-friendly interface</li>
-            <li>Completely free to use</li>
-          </ul>
-        </section>
+          {/* Why Choose Us */}
+          <section>
+            <h2 className="text-2xl font-bold text-purple-700 mb-4">
+              🚀 Why Choose Us?
+            </h2>
+            <ul className="list-disc pl-6 space-y-2">
+              <li>⚡ Fast and reliable link shortening</li>
+              <li>🎯 Custom aliases for memorable URLs</li>
+              <li>🛡️ Zero tracking, 100% privacy focused</li>
+              <li>💡 Minimal, clean, user-friendly design</li>
+              <li>💸 Totally free—forever</li>
+            </ul>
+          </section>
 
-        <section>
-          <h2 className="text-2xl font-semibold text-gray-700 mb-4">
-            Get in Touch
-          </h2>
-          <p className="text-lg text-gray-800">
-            We value your feedback and suggestions. If you have any questions,
-            or if you'd like to get in touch with our team, feel free to reach
-            out to us through the contact form on our{" "}
-            <a href="/contact" className="text-blue-500 hover:text-blue-700">
-              Contact Us
-            </a>{" "}
-            page.
-          </p>
-        </section>
+          {/* Contact */}
+          <section>
+            <h2 className="text-2xl font-bold text-purple-700 mb-4">
+              📬 Get in Touch
+            </h2>
+            <p>
+              We'd love to hear from you! Whether you have feedback, feature
+              ideas, or just want to say hello—head over to our{" "}
+              <Link
+                href="/contact"
+                className="text-blue-600 hover:underline font-medium"
+              >
+                Contact
+              </Link>{" "}
+              page and drop us a message.
+            </p>
+          </section>
+        </div>
       </div>
-    </div>
+    </main>
   );
 };
 

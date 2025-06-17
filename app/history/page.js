@@ -1,6 +1,10 @@
-"use client"
+"use client";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Loader, Copy } from "lucide-react";
+import toast from "react-hot-toast";
+
 export default function UrlsPage() {
   const [urls, setUrls] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,36 +28,76 @@ export default function UrlsPage() {
     fetchUrls();
   }, []);
 
-  return (
-    <div className="max-w-3xl mx-auto p-6 bg-gray-300 my-8 rounded-xl">
-      <h1 className="text-3xl text-purple-700 font-bold text-center mb-6">Shortened URLs History</h1>
+  const handleCopy = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Short URL copied to clipboard!");
+  };
 
-      {loading && <p className="text-center">Loading...</p>}
-      {error && <p className="text-center text-red-500">{error}</p>}
+  return (
+    <div className="max-w-4xl mx-auto px-6 py-10">
+      <h1 className="text-4xl font-bold text-purple-700 text-center mb-8">
+        Shortened URLs History
+      </h1>
+
+      {loading && (
+        <div className="flex flex-col items-center">
+          <Loader className="animate-spin text-purple-700 mb-4" size={36} />
+          <p className="text-lg text-gray-600">Fetching URLs...</p>
+        </div>
+      )}
+
+      {error && <p className="text-center text-red-500 text-lg">{error}</p>}
 
       {!loading && urls.length === 0 && (
-        <p className="text-center text-gray-500">No URLs found.</p>
+        <p className="text-center text-gray-600 text-lg">
+          No shortened URLs found.
+        </p>
       )}
 
       {!loading && urls.length > 0 && (
-        <ul className="bg-white shadow-md rounded-lg p-4">
+        <div className="bg-white rounded-xl shadow-md divide-y">
           {urls.map((url) => (
-            <li key={url._id} className="border-b py-2 flex flex-col gap-3">
-              <p >
-                Original URL:{" "}
-                <Link href={url.originalUrl} className="text-blue-500 ">
+            <div
+              key={url._id}
+              className="p-5 space-y-2 hover:bg-gray-50 transition"
+            >
+              <p className="text-gray-800">
+                <span className="font-medium">Original:</span>{" "}
+                <Link
+                  href={url.originalUrl}
+                  target="_blank"
+                  className="text-blue-600 hover:underline break-all"
+                >
                   {url.originalUrl}
                 </Link>
               </p>
-              <p>
-                Shortened URL:{" "}
-                <Link href={`/s/${url.shortenedUrl}`} className="text-green-500 ">
-                  {url.shortenedUrl}
-                </Link>
-              </p>
-            </li>
+              <div className="flex items-center justify-between gap-4">
+                <p className="text-gray-800">
+                  <span className="font-medium">Shortened:</span>{" "}
+                  <Link
+                    href={`/s/${url.shortenedUrl}`}
+                    className="text-green-600 hover:underline"
+                  >
+                    {`${
+                      process.env.NEXT_PUBLIC_SITE_URL || "https://short.link"
+                    }/s/${url.shortenedUrl}`}
+                  </Link>
+                </p>
+                <button
+                  onClick={() =>
+                    handleCopy(
+                      `${window.location.origin}/s/${url.shortenedUrl}`
+                    )
+                  }
+                  className="text-purple-600 hover:text-purple-800"
+                  title="Copy to clipboard"
+                >
+                  <Copy size={20} />
+                </button>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );
