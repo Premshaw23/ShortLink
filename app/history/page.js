@@ -30,7 +30,7 @@ export default function UrlsPage() {
 
   const handleCopy = (text) => {
     navigator.clipboard.writeText(text);
-    toast.success("Short URL copied to clipboard!");
+    toast.success("Link copied to clipboard!");
   };
 
   return (
@@ -71,6 +71,18 @@ export default function UrlsPage() {
                   {url.originalUrl}
                 </Link>
               </p>
+
+              <p className="text-gray-800">
+                <span className="font-medium">Expires:</span>{" "}
+                <span className="text-red-600">
+                  {new Date(url.expiresAt).toLocaleDateString("en-IN", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
+              </p>
+
               <div className="flex items-center justify-between gap-4">
                 <p className="text-gray-800">
                   <span className="font-medium">Shortened:</span>{" "}
@@ -83,14 +95,19 @@ export default function UrlsPage() {
                     }/s/${url.shortenedUrl}`}
                   </Link>
                 </p>
+
                 <button
                   onClick={() =>
                     handleCopy(
-                      `${window.location.origin}/s/${url.shortenedUrl}`
+                      `${
+                        process.env.NEXT_PUBLIC_SITE_URL ||
+                        window.location.origin
+                      }/s/${url.shortenedUrl}`
                     )
                   }
                   className="text-purple-600 hover:text-purple-800"
                   title="Copy to clipboard"
+                  aria-label="Copy shortened URL"
                 >
                   <Copy size={20} />
                 </button>

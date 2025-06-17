@@ -2,23 +2,35 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-purple-700 text-white shadow-md sticky top-0 z-20">
+    <nav className="bg-gradient-to-r from-indigo-600 via-purple-800 to-indigo-600 text-white shadow-md sticky top-0 z-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-        {/* Logo */}
-        <div className="text-2xl font-bold">
-          <Link href="/" className="hover:text-purple-300 transition">
+        {/* Logo + Brand */}
+        <div className="flex items-center gap-2 text-2xl font-bold">
+          <Link
+            href="/"
+            className="flex items-center gap-2 hover:opacity-80 transition"
+          >
+            <Image
+              src="/logo.png" // Ensure this matches your public/logo.png
+              alt="ShortLink Logo"
+              width={32}
+              height={32}
+              priority
+              className="shadow-sm bg-indigo-400 shadow-black rounded-full"
+            />
             ShortLink
           </Link>
         </div>
 
         {/* Desktop Navigation */}
-        <ul className="hidden md:flex gap-6 items-center">
+        <ul className="hidden md:flex gap-6 items-center text-sm font-medium">
           <li className="hover:text-purple-300 transition">
             <Link href="/">Home</Link>
           </li>
@@ -33,7 +45,7 @@ const Navbar = () => {
           </li>
           <li className="flex gap-3 ml-4">
             <Link href="/history">
-              <button className="bg-purple-500 hover:bg-purple-600 transition px-4 py-2 rounded-lg font-semibold shadow">
+              <button className="bg-purple-600 hover:bg-purple-700 transition px-4 py-2 rounded-lg font-semibold shadow">
                 History
               </button>
             </Link>
@@ -41,7 +53,7 @@ const Navbar = () => {
               href="https://github.com/Premshaw23/ShortLink"
               target="_blank"
             >
-              <button className="bg-purple-500 hover:bg-purple-600 transition px-4 py-2 rounded-lg font-semibold shadow">
+              <button className="bg-purple-600 hover:bg-purple-700 transition px-4 py-2 rounded-lg font-semibold shadow">
                 GitHub
               </button>
             </Link>
@@ -61,30 +73,20 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <ul className="md:hidden px-6 pb-4 space-y-3 bg-purple-600">
-          <li>
-            <Link href="/" onClick={() => setIsOpen(false)}>
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link href="/about" onClick={() => setIsOpen(false)}>
-              About
-            </Link>
-          </li>
-          <li>
-            <Link href="/shorten" onClick={() => setIsOpen(false)}>
-              Shorten
-            </Link>
-          </li>
-          <li>
-            <Link href="/contact" onClick={() => setIsOpen(false)}>
-              Contact
-            </Link>
-          </li>
+        <ul className="md:hidden px-6 pb-4 space-y-3 bg-gradient-to-b from-purple-700 to-blue-600 text-white">
+          {["/", "/about", "/shorten", "/contact"].map((path, i) => (
+            <li key={i}>
+              <Link href={path} onClick={() => setIsOpen(false)}>
+                {path === "/"
+                  ? "Home"
+                  : path.replace("/", "").charAt(0).toUpperCase() +
+                    path.slice(2)}
+              </Link>
+            </li>
+          ))}
           <li>
             <Link href="/history" onClick={() => setIsOpen(false)}>
-              <button className="w-full bg-purple-500 hover:bg-purple-600 transition px-4 py-2 rounded-lg font-semibold shadow">
+              <button className="w-full bg-purple-600 hover:bg-purple-700 transition px-4 py-2 rounded-lg font-semibold shadow">
                 History
               </button>
             </Link>
@@ -93,8 +95,9 @@ const Navbar = () => {
             <Link
               href="https://github.com/Premshaw23/ShortLink"
               target="_blank"
+              onClick={() => setIsOpen(false)}
             >
-              <button className="w-full bg-purple-500 hover:bg-purple-600 transition px-4 py-2 rounded-lg font-semibold shadow">
+              <button className="w-full bg-purple-600 hover:bg-purple-700 transition px-4 py-2 rounded-lg font-semibold shadow">
                 GitHub
               </button>
             </Link>
