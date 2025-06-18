@@ -7,7 +7,8 @@ import { ClipboardCopy, Check } from "lucide-react";
 const ShortenPage = () => {
   const [originalUrl, setOriginalUrl] = useState("");
   const [customShortened, setCustomShortened] = useState("");
-  const [expirationDays, setExpirationDays] = useState(7);
+  const [expirationDays, setExpirationDays] = useState(2);
+  const [password, setPassword] = useState(""); // 🔧 NEW
   const [shortenedUrl, setShortenedUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -20,7 +21,12 @@ const ShortenPage = () => {
       return;
     }
 
-    const data = { originalUrl, customShortened, expirationDays };
+    const data = {
+      originalUrl,
+      customShortened,
+      expirationDays,
+      password, // 🔧 INCLUDE password
+    };
 
     setLoading(true);
     try {
@@ -54,10 +60,20 @@ const ShortenPage = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleClear = () => {
+    setOriginalUrl("");
+    setCustomShortened("");
+    setPassword("");
+    setExpirationDays(2);
+    setShortenedUrl("");
+    setCopied(false);
+  };
+  
+
   return (
-    <div className="max-w-lg mx-auto p-6 py-10 bg-slate-200 shadow-xl shadow-stone-400 rounded-xl my-20">
-      <h1 className="text-4xl font-bold text-center text-purple-600 mb-6">
-        URL Shortener
+    <div className="max-w-2xl w-full mx-auto p-6 sm:p-10 bg-white shadow-xl shadow-gray-500 rounded-2xl my-10 sm:my-10">
+      <h1 className="text-4xl font-bold text-center text-purple-600 mb-8">
+        🔗 URL Shortener
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -65,46 +81,64 @@ const ShortenPage = () => {
         <div>
           <label
             htmlFor="originalUrl"
-            className="block text-lg font-medium text-gray-700"
+            className="block text-sm font-semibold text-gray-800 mb-1"
           >
-            Enter URL:
+            Original URL
           </label>
           <input
-            type="text"
+            type="url"
             id="originalUrl"
             value={originalUrl}
             onChange={(e) => setOriginalUrl(e.target.value)}
             placeholder="https://example.com"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
             required
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
 
-        {/* Custom alias */}
+        {/* Custom Alias */}
         <div>
           <label
             htmlFor="customShortened"
-            className="block text-lg font-medium text-gray-700"
+            className="block text-sm font-semibold text-gray-800 mb-1"
           >
-            Custom Alias (Optional):
+            Custom Alias (Optional)
           </label>
           <input
             type="text"
             id="customShortened"
             value={customShortened}
             onChange={(e) => setCustomShortened(e.target.value)}
-            placeholder="e.g., my-url"
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+            placeholder="e.g., my-link"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
 
-        {/* Expiration input */}
+        {/* Password */}
+        <div>
+          <label
+            htmlFor="password"
+            className="block text-sm font-semibold text-gray-800 mb-1"
+          >
+            Password (Optional)
+          </label>
+          <input
+            type="password"
+            id="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Protect your link"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          />
+        </div>
+
+        {/* Expiration */}
         <div>
           <label
             htmlFor="expirationDays"
-            className="block text-lg font-medium text-gray-700"
+            className="block text-sm font-semibold text-gray-800 mb-1"
           >
-            Expiration (in days):
+            Expiration (in days)
           </label>
           <input
             type="number"
@@ -113,42 +147,54 @@ const ShortenPage = () => {
             max={365}
             value={expirationDays}
             onChange={(e) => setExpirationDays(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
           />
         </div>
 
-        {/* Submit button */}
-        <button
-          type="submit"
-          className="w-full flex justify-center items-center bg-purple-600 text-white p-3 rounded-lg font-semibold hover:bg-purple-700"
-          disabled={loading}
-        >
-          {loading ? (
-            <span className="animate-spin mr-2 h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
-          ) : null}
-          Shorten URL
-        </button>
+        {/* Buttons Section */}
+        <div className="space-y-2 mt-4">
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-purple-600 hover:bg-purple-700 transition text-white py-3 rounded-lg font-semibold flex justify-center items-center"
+          >
+            {loading && (
+              <span className="animate-spin mr-2 h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+            )}
+            Shorten URL
+          </button>
+
+          {/* Clear All Button */}
+          <button
+            type="button"
+            onClick={handleClear}
+            className="w-full bg-gray-300 hover:bg-gray-400 transition text-gray-800 py-3 rounded-lg font-semibold"
+          >
+            Clear All
+          </button>
+        </div>
       </form>
 
       {/* Result */}
       {shortenedUrl && (
-        <div className="mt-6 text-center">
-          <p className="text-lg font-semibold text-gray-700 mb-2">
+        <div className="mt-8 transition-all duration-500 ease-in-out opacity-100">
+          <p className="text-center text-lg font-medium text-gray-800 mb-2">
             Shortened URL:
           </p>
-          <div className="flex justify-center items-center gap-2 bg-white p-2 rounded-lg shadow-inner">
+          <div className="flex justify-center items-center gap-2 bg-gray-100 px-4 py-3 rounded-lg shadow-inner break-all">
             <a
               href={shortenedUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-500 hover:text-blue-700 break-all"
+              className="text-blue-600 hover:underline"
             >
               {shortenedUrl}
             </a>
             <button
               onClick={handleCopy}
-              className="text-purple-600 hover:text-purple-800"
-              title="Copy"
+              className="text-purple-600 hover:text-purple-800 transition"
+              title="Copy to clipboard"
             >
               {copied ? <Check size={18} /> : <ClipboardCopy size={18} />}
             </button>

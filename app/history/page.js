@@ -91,7 +91,7 @@ export default function UrlsPage() {
                     className="text-green-600 hover:underline"
                   >
                     {`${
-                      process.env.NEXT_PUBLIC_SITE_URL || "https://short.link"
+                      process.env.NEXT_PUBLIC_BASE_URL || "https://short.link"
                     }/s/${url.shortenedUrl}`}
                   </Link>
                 </p>
@@ -100,7 +100,7 @@ export default function UrlsPage() {
                   onClick={() =>
                     handleCopy(
                       `${
-                        process.env.NEXT_PUBLIC_SITE_URL ||
+                        process.env.NEXT_PUBLIC_BASE_URL ||
                         window.location.origin
                       }/s/${url.shortenedUrl}`
                     )

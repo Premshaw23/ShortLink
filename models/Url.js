@@ -1,4 +1,4 @@
-// No Mongoose needed
+import bcrypt from "bcrypt";
 import connectDb from "../lib/mongodb";
 
 // Helper to get collection
@@ -14,22 +14,43 @@ const getUrlCollection = async () => {
 export const createUrl = async (
   originalUrl,
   shortenedUrl,
-  expireAt // now using specific date directly
+  expiresAt,
+  password = null
 ) => {
   const urls = await getUrlCollection();
   const now = new Date();
+  let hashedPassword = null;
+  if (password) {
+    const salt = await bcrypt.genSalt(10);
+    hashedPassword = await bcrypt.hash(password, salt);
+  }
 
-  const result = await urls.insertOne({
-    originalUrl,
-    shortenedUrl,
-    createdAt: now,
-    expiresAt: expireAt, // use passed-in date directly
-    clicks: 0,
-  });
+  try {
+    const result = await urls.insertOne({
+      originalUrl,
+      shortenedUrl,
+      createdAt: now,
+      expiresAt,
+      password: hashedPassword || null,
+    });
 
-  return result.insertedId;
+    return { success: true, id: result.insertedId };
+  } catch (err) {
+    if (err.code === 11000) {
+      return {
+        success: false,
+        message: "Shortened URL already exists. Choose a different slug.",
+        status: 409,
+      };
+    }
+
+    return {
+      success: false,
+      message: "Server error. Please try again.",
+      status: 500,
+    };
+  }
 };
-
 
 // ✅ Get all URLs (for admin/history)
 export const getAllUrls = async () => {

@@ -14,7 +14,7 @@ const normalizeUrl = (url) => {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { originalUrl, customShortened, expirationDays = 7 } = body;
+    const { originalUrl, customShortened, expirationDays = 7 ,password} = body;
 
     if (!originalUrl) {
       return NextResponse.json(
@@ -42,7 +42,7 @@ export async function POST(request) {
     );
 
     // Insert to DB
-    const insertedId = await createUrl(normalizedUrl, shortened, expireAt);
+    const insertedId = await createUrl(normalizedUrl, shortened, expireAt,password);
 
     const shortenedUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/s/${shortened}`;
 

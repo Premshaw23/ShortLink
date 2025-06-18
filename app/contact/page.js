@@ -40,8 +40,8 @@ const ContactUs = () => {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b shadow-md from-purple-50 to-purple-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-xl">
+    <main className="min-h-screen bg-gradient-to-b from-purple-50 to-purple-100 py-12 px-4">
+      <div className="max-w-2xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-md shadow-gray-500">
         <h1 className="text-4xl font-extrabold text-center text-purple-700 mb-8">
           Contact Us
         </h1>
@@ -58,7 +58,7 @@ const ContactUs = () => {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
               placeholder="John Doe"
               required
             />
@@ -76,7 +76,7 @@ const ContactUs = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
               placeholder="john@example.com"
               required
             />
@@ -94,7 +94,7 @@ const ContactUs = () => {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={5}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 transition"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:outline-none focus:ring-purple-500 transition"
               placeholder="Write your message here..."
               required
             ></textarea>
