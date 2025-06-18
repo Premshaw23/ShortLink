@@ -23,19 +23,26 @@ const RedirectPage = ({ params }) => {
     const fetchUrlDetails = async () => {
       try {
         const res = await fetch(`/api/resolve/${slug}`);
-        const data = await res.json();
-
-        if (!res.ok) throw new Error(data.message || "Failed to load.");
-
+        let data = {};
+        try {
+          data = await res.json();
+        } catch {
+          data = {};
+        }
+        if (!res.ok) {
+          toast.error(data.message || "Invalid or expired link.");
+          setTimeout(() => router.replace("/expired"), 1500);
+          return;
+        }
         if (data.passwordProtected) {
           setIsProtected(true);
         } else {
-          setRedirecting(true); // 👈 set redirecting state
-          router.replace(data.originalUrl); // ✅ Redirect directly
+          setRedirecting(true);
+          router.replace(data.originalUrl);
         }
       } catch (err) {
-        toast.error(err.message);
-        router.replace("/expired");
+        toast.error(err.message || "Invalid or expired link.");
+        setTimeout(() => router.replace("/expired"), 1500);
       } finally {
         setLoading(false);
       }
