@@ -32,6 +32,8 @@ export const createUrl = async (
       createdAt: now,
       expiresAt,
       password: hashedPassword || null,
+      clicks: 0,
+      clickLogs: [],
     });
 
     return { success: true, id: result.insertedId };
@@ -71,10 +73,25 @@ export const findUrlByShortened = async (shortenedUrl) => {
 };
 
 // ✅ Increment click count for analytics
-export const incrementClickCount = async (shortenedUrl) => {
+export const incrementClickCount = async (shortenedUrl, logData = null) => {
   const urls = await getUrlCollection();
-  await urls.updateOne({ shortenedUrl }, { $inc: { clicks: 1 } });
+
+  const update = {
+    $inc: { clicks: 1 },
+  };
+
+  if (logData) {
+    update.$push = {
+      clickLogs: {
+        $each: [logData],
+        $slice: -100, // Optional: keep last 100 entries
+      },
+    };
+  }
+
+  await urls.updateOne({ shortenedUrl }, update);
 };
+
 
 // ✅ Get paginated URLs (optional frontend use)
 export const getUrlsPaginated = async (page = 1, limit = 10) => {

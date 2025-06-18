@@ -1,6 +1,6 @@
 # 🔗 ShortLink – Simple & Private URL Shortener
 
-ShortLink is a privacy-focused, user-friendly URL shortening service built with modern web technologies. No sign-ups, no tracking — just fast and secure short links.
+ShortLink is a privacy-focused, user-friendly URL shortening service built with Next.js, React, and MongoDB. No sign-ups, no tracking — just fast, secure, and customizable short links with analytics.
 
 ---
 
@@ -10,6 +10,10 @@ ShortLink is a privacy-focused, user-friendly URL shortening service built with 
 - 🧩 **Custom Aliases**: Optionally create personalized short links.
 - 🧼 **Clean UI**: Intuitive and responsive user interface.
 - 🔐 **Privacy-First**: No unnecessary tracking or logins.
+- 🔑 **Password-Protected Links**: Secure your links with a password.
+- ⏳ **Link Expiration**: Set expiration dates for your short links.
+- 📊 **Analytics**: Track clicks, IPs, user agents, and view beautiful charts.
+- 🛡️ **Rate Limiting**: Prevents abuse and spam.
 - 💸 **Free to Use**: 100% free for everyone.
 
 ---
@@ -22,9 +26,10 @@ At **ShortLink**, our mission is to provide a simple and reliable URL shortening
 
 ## 🛠 Tech Stack
 
-- **Frontend**: React.js, Tailwind CSS
-- **Backend**: Node.js / Express (or Firebase/MongoDB, depending on your implementation)
+- **Frontend**: Next.js, React.js, Tailwind CSS
+- **Backend**: Node.js (API routes), MongoDB
 - **Email Handling**: EmailJS for contact form submissions
+- **Analytics**: Built-in, with charts and logs
 - **Deployment**: Vercel / Netlify / Render (or your choice)
 
 ---
@@ -49,16 +54,45 @@ If you’d like to help improve ShortLink, please fork the repo and submit a PR.
 
 ---
 
-## 📸 Screenshots (optional)
+## 📸 Screenshots
 
 _Add screenshots here if available._
 
 ---
 
-## 💡 Future Improvements (Optional Section)
+## 💡 Future Improvements
 
-- 📊 Link analytics dashboard  
-- 🛡️ Password-protected short URLs  
-- 📱 PWA support  
+- 📊 Advanced analytics dashboard (geolocation, device stats)
+- 🛡️ More link protection options (e.g., captcha, one-time links)
+- 📱 PWA support
 - 🌍 Multi-language interface
+- 🧑‍💻 Admin panel for managing links
+- 📦 Bulk URL shortening
+- 📎 QR code generation for each link
+
+---
+
+## Getting Started
+
+1. **Clone the repo:**
+   ```bash
+   git clone https://github.com/yourusername/ShortLink.git
+   cd ShortLink
+   ```
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+3. **Set up environment variables:**
+   - See `.env.example` for required variables (MongoDB URI, EmailJS, etc.)
+4. **Run locally:**
+   ```bash
+   npm run dev
+   ```
+5. **Deploy:**
+   - Deploy to Vercel, Netlify, or your preferred platform.
+
+---
+
+## ⭐️ Star this repo if you like it!
 

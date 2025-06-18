@@ -2,13 +2,24 @@
 
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { ClipboardCopy, Check } from "lucide-react";
+import { ClipboardCopy, Check, Eye, EyeOff, Sparkles } from "lucide-react";
+
+const generatePassword = () => {
+  // Simple strong password generator
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%&*";
+  let pass = "";
+  for (let i = 0; i < 12; i++) {
+    pass += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return pass;
+};
 
 const ShortenPage = () => {
   const [originalUrl, setOriginalUrl] = useState("");
   const [customShortened, setCustomShortened] = useState("");
   const [expirationDays, setExpirationDays] = useState(2);
-  const [password, setPassword] = useState(""); // 🔧 NEW
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [shortenedUrl, setShortenedUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -25,7 +36,7 @@ const ShortenPage = () => {
       originalUrl,
       customShortened,
       expirationDays,
-      password, // 🔧 INCLUDE password
+      password,
     };
 
     setLoading(true);
@@ -68,21 +79,24 @@ const ShortenPage = () => {
     setShortenedUrl("");
     setCopied(false);
   };
-  
+
+  const handleSuggestPassword = () => {
+    const newPass = generatePassword();
+    setPassword(newPass);
+    setShowPassword(true);
+    toast.success("Strong password suggested!");
+  };
 
   return (
     <div className="max-w-2xl w-full mx-auto p-6 sm:p-10 bg-white shadow-xl shadow-gray-500 rounded-2xl my-10 sm:my-10">
-      <h1 className="text-4xl font-bold text-center text-purple-600 mb-8">
-        🔗 URL Shortener
+      <h1 className="text-4xl font-bold text-center text-purple-600 mb-8 flex items-center justify-center gap-2">
+        <Sparkles className="text-purple-400" size={32} /> URL Shortener
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Original URL */}
         <div>
-          <label
-            htmlFor="originalUrl"
-            className="block text-sm font-semibold text-gray-800 mb-1"
-          >
+          <label htmlFor="originalUrl" className="block text-sm font-semibold text-gray-800 mb-1">
             Original URL
           </label>
           <input
@@ -98,10 +112,7 @@ const ShortenPage = () => {
 
         {/* Custom Alias */}
         <div>
-          <label
-            htmlFor="customShortened"
-            className="block text-sm font-semibold text-gray-800 mb-1"
-          >
+          <label htmlFor="customShortened" className="block text-sm font-semibold text-gray-800 mb-1">
             Custom Alias (Optional)
           </label>
           <input
@@ -116,28 +127,42 @@ const ShortenPage = () => {
 
         {/* Password */}
         <div>
-          <label
-            htmlFor="password"
-            className="block text-sm font-semibold text-gray-800 mb-1"
-          >
+          <label htmlFor="password" className="text-sm font-semibold text-gray-800 mb-1 flex items-center gap-2">
             Password (Optional)
+            <button
+              type="button"
+              onClick={handleSuggestPassword}
+              className="ml-2 text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded border border-purple-200 bg-purple-50 flex items-center gap-1"
+              title="Suggest strong password"
+            >
+              <Sparkles size={16} /> Suggest
+            </button>
           </label>
-          <input
-            type="password"
-            id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Protect your link"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Protect your link"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
+              autoComplete="new-password"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-700"
+              tabIndex={-1}
+              title={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
         </div>
 
         {/* Expiration */}
         <div>
-          <label
-            htmlFor="expirationDays"
-            className="block text-sm font-semibold text-gray-800 mb-1"
-          >
+          <label htmlFor="expirationDays" className="block text-sm font-semibold text-gray-800 mb-1">
             Expiration (in days)
           </label>
           <input
