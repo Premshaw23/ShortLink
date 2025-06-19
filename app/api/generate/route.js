@@ -14,7 +14,7 @@ const normalizeUrl = (url) => {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { originalUrl, customShortened, expirationDays = 7 ,password} = body;
+    const { originalUrl, customShortened, expirationDateTime, password } = body;
 
     if (!originalUrl) {
       return NextResponse.json(
@@ -37,16 +37,29 @@ export async function POST(request) {
       );
     }
 
-    const expireAt = new Date(
-      Date.now() + expirationDays * 24 * 60 * 60 * 1000
-    );
+    let expireAt = null;
+    if (expirationDateTime) {
+      expireAt = new Date(expirationDateTime);
+      if (isNaN(expireAt.getTime()) || expireAt < new Date()) {
+        return NextResponse.json(
+          { message: "Expiration date/time must be in the future." },
+          { status: 400 }
+        );
+      }
+    } else {
+      // fallback: 7 days from now
+      expireAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    }
 
     // Insert to DB
-    const insertedId = await createUrl(normalizedUrl, shortened, expireAt,password);
+    const inserted = await createUrl(normalizedUrl, shortened, expireAt, password);
+    if (!inserted.success) {
+      return NextResponse.json({ message: inserted.message }, { status: inserted.status || 500 });
+    }
 
     const shortenedUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/s/${shortened}`;
 
-    return NextResponse.json({ shortenedUrl, id: insertedId });
+    return NextResponse.json({ shortenedUrl, id: inserted.id });
   } catch (error) {
     console.error("Shorten Error:", error);
     return NextResponse.json(

@@ -17,7 +17,7 @@ const generatePassword = () => {
 const ShortenPage = () => {
   const [originalUrl, setOriginalUrl] = useState("");
   const [customShortened, setCustomShortened] = useState("");
-  const [expirationDays, setExpirationDays] = useState(2);
+  const [expirationDateTime, setExpirationDateTime] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [shortenedUrl, setShortenedUrl] = useState("");
@@ -35,7 +35,7 @@ const ShortenPage = () => {
     const data = {
       originalUrl,
       customShortened,
-      expirationDays,
+      expirationDateTime, // send ISO string
       password,
     };
 
@@ -75,7 +75,7 @@ const ShortenPage = () => {
     setOriginalUrl("");
     setCustomShortened("");
     setPassword("");
-    setExpirationDays(2);
+    setExpirationDateTime("");
     setShortenedUrl("");
     setCopied(false);
   };
@@ -88,15 +88,18 @@ const ShortenPage = () => {
   };
 
   return (
-    <div className="max-w-2xl w-full mx-auto p-6 sm:p-10 bg-white shadow-xl shadow-gray-500 rounded-2xl my-10 sm:my-10">
-      <h1 className="text-4xl font-bold text-center text-purple-600 mb-8 flex items-center justify-center gap-2">
-        <Sparkles className="text-purple-400" size={32} /> URL Shortener
+    <div className="w-full max-w-2xl mx-auto p-6 sm:p-8 bg-gradient-to-br from-purple-200 via-white to-purple-100 shadow-lg shadow-neutral-500 rounded-3xl my-10 border border-purple-200">
+      <h1 className="text-3xl font-extrabold text-center text-purple-700 mb-8 flex items-center justify-center gap-2 drop-shadow">
+        <Sparkles className="text-purple-400" size={28} /> URL Shortener
       </h1>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Original URL */}
-        <div>
-          <label htmlFor="originalUrl" className="block text-sm font-semibold text-gray-800 mb-1">
+        <div className="bg-white/90 border border-purple-100 rounded-lg p-3 shadow-sm flex flex-col gap-1">
+          <label
+            htmlFor="originalUrl"
+            className="text-sm font-semibold text-gray-800 mb-1"
+          >
             Original URL
           </label>
           <input
@@ -106,13 +109,16 @@ const ShortenPage = () => {
             onChange={(e) => setOriginalUrl(e.target.value)}
             placeholder="https://example.com"
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm"
           />
         </div>
 
         {/* Custom Alias */}
-        <div>
-          <label htmlFor="customShortened" className="block text-sm font-semibold text-gray-800 mb-1">
+        <div className="bg-white/90 border border-purple-100 rounded-lg p-3 shadow-sm flex flex-col gap-1">
+          <label
+            htmlFor="customShortened"
+            className="text-sm font-semibold text-gray-800 mb-1"
+          >
             Custom Alias (Optional)
           </label>
           <input
@@ -121,13 +127,16 @@ const ShortenPage = () => {
             value={customShortened}
             onChange={(e) => setCustomShortened(e.target.value)}
             placeholder="e.g., my-link"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm"
           />
         </div>
 
         {/* Password */}
-        <div>
-          <label htmlFor="password" className="text-sm font-semibold text-gray-800 mb-1 flex items-center gap-2">
+        <div className="bg-white/90 border border-purple-100 rounded-lg p-3 shadow-sm flex flex-col gap-1">
+          <label
+            htmlFor="password"
+            className="text-sm font-semibold text-gray-800 mb-1 flex items-center gap-2"
+          >
             Password (Optional)
             <button
               type="button"
@@ -135,7 +144,7 @@ const ShortenPage = () => {
               className="ml-2 text-purple-600 hover:text-purple-800 text-xs px-2 py-1 rounded border border-purple-200 bg-purple-50 flex items-center gap-1"
               title="Suggest strong password"
             >
-              <Sparkles size={16} /> Suggest
+              <Sparkles size={14} /> Suggest
             </button>
           </label>
           <div className="relative">
@@ -145,56 +154,111 @@ const ShortenPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Protect your link"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 pr-12"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow pr-10 focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm"
               autoComplete="new-password"
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-700"
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purple-700"
               tabIndex={-1}
               title={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
 
         {/* Expiration */}
-        <div>
-          <label htmlFor="expirationDays" className="block text-sm font-semibold text-gray-800 mb-1">
-            Expiration (in days)
+        <div className="bg-white/90 border border-purple-100 rounded-lg p-3 shadow-sm flex flex-col gap-1">
+          <label
+            htmlFor="expirationDateTime"
+            className="text-sm font-semibold text-gray-800 mb-1 flex items-center gap-2"
+          >
+            {/* Calendar Icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 text-purple-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+            {/* Clock Icon */}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-4 w-4 text-purple-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Expiration (date & time)
           </label>
-          <input
-            type="number"
-            id="expirationDays"
-            min={1}
-            max={365}
-            value={expirationDays}
-            onChange={(e) => setExpirationDays(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-          />
+          <div className="flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-lg px-2 py-1 w-full max-w-xs">
+            <input
+              type="datetime-local"
+              id="expirationDateTime"
+              value={expirationDateTime}
+              onChange={(e) => setExpirationDateTime(e.target.value)}
+              className="flex-1 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-300 bg-white text-sm"
+              min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+                .toISOString()
+                .slice(0, 16)}
+              required
+            />
+            {expirationDateTime && (
+              <button
+                type="button"
+                onClick={() => setExpirationDateTime("")}
+                className="text-xs text-purple-600 hover:text-purple-900 px-2 py-1 rounded border border-purple-200 bg-white whitespace-nowrap"
+                title="Clear date/time"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            Set the exact date and time when the link should expire.
+            {expirationDateTime &&
+              new Date(expirationDateTime) < new Date() && (
+                <span className="text-red-600 font-semibold ml-2">
+                  (Date/time must be in the future)
+                </span>
+              )}
+          </p>
         </div>
 
         {/* Buttons Section */}
-        <div className="space-y-2 mt-4">
+        <div className="flex flex-col sm:flex-row gap-2 mt-4">
           {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 transition text-white py-3 rounded-lg font-semibold flex justify-center items-center"
+            className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 transition text-white py-2 px-6 rounded-lg font-semibold flex justify-center items-center shadow-lg focus:outline-none focus:ring-2 focus:ring-purple-400 text-base"
           >
             {loading && (
               <span className="animate-spin mr-2 h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
             )}
             Shorten URL
           </button>
-
           {/* Clear All Button */}
           <button
             type="button"
             onClick={handleClear}
-            className="w-full bg-gray-300 hover:bg-gray-400 transition text-gray-800 py-3 rounded-lg font-semibold"
+            className="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 transition text-gray-800 py-2 px-6 rounded-lg font-semibold shadow focus:outline-none focus:ring-2 focus:ring-purple-200 text-base"
           >
             Clear All
           </button>
@@ -203,16 +267,16 @@ const ShortenPage = () => {
 
       {/* Result */}
       {shortenedUrl && (
-        <div className="mt-8 transition-all duration-500 ease-in-out opacity-100">
-          <p className="text-center text-lg font-medium text-gray-800 mb-2">
+        <div className="mt-8 transition-all duration-500 ease-in-out opacity-100 bg-green-100 border border-green-200 rounded-lg p-4 shadow flex flex-col items-center">
+          <p className="text-center text-base font-medium text-gray-800 mb-2">
             Shortened URL:
           </p>
-          <div className="flex justify-center items-center gap-2 bg-gray-100 px-4 py-3 rounded-lg shadow-inner break-all">
+          <div className="flex justify-center items-center gap-2 bg-white px-3 py-2 rounded-lg shadow-inner break-all border border-green-100">
             <a
               href={shortenedUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
+              className="text-blue-600 hover:underline font-semibold"
             >
               {shortenedUrl}
             </a>
