@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+.nav-btn {
+  @apply transition px-5 py-2 rounded-lg font-bold shadow border;
+}
+
+
 @layer base {
   :root {
     --background: 0 0% 100%;

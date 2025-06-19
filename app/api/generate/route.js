@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import connectDb from "../../../lib/mongodb";
 import { createUrl, findUrlByShortened } from "../../../models/Url";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 // Helper to normalize URL
 const normalizeUrl = (url) => {
@@ -38,7 +40,20 @@ export async function POST(request) {
     }
 
     let expireAt = null;
-    if (expirationDateTime) {
+    let session = null;
+    try {
+      session = await getServerSession(authOptions);
+    } catch {}
+    if (!session?.user?.email) {
+      // Anonymous: always expire in 1 day, ignore user-provided expiration
+      expireAt = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
+      if (expirationDateTime) {
+        return NextResponse.json(
+          { message: "Sign in to set a custom expiration date/time." },
+          { status: 401 }
+        );
+      }
+    } else if (expirationDateTime) {
       expireAt = new Date(expirationDateTime);
       if (isNaN(expireAt.getTime()) || expireAt < new Date()) {
         return NextResponse.json(
@@ -47,12 +62,12 @@ export async function POST(request) {
         );
       }
     } else {
-      // fallback: 7 days from now
+      // Logged in, default to 7 days
       expireAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     }
-
     // Insert to DB
-    const inserted = await createUrl(normalizedUrl, shortened, expireAt, password);
+    const owner = session?.user?.email || null;
+    const inserted = await createUrl(normalizedUrl, shortened, expireAt, password, owner);
     if (!inserted.success) {
       return NextResponse.json({ message: inserted.message }, { status: inserted.status || 500 });
     }

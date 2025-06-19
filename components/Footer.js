@@ -52,6 +52,24 @@ export default function Footer() {
             Analytics
           </Link>
           <Link
+            href="/faq"
+            className="text-purple-200 hover:text-white transition font-medium"
+          >
+            FAQ
+          </Link>
+          <Link
+            href="/privacy"
+            className="text-purple-200 hover:text-white transition font-medium"
+          >
+            Privacy Policy
+          </Link>
+          <Link
+            href="/terms"
+            className="text-purple-200 hover:text-white transition font-medium"
+          >
+            Terms
+          </Link>
+          <Link
             href="https://github.com/Premshaw23/ShortLink"
             target="_blank"
             className="inline-flex items-center gap-1 text-purple-200 hover:text-white transition font-medium"

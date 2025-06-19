@@ -13,6 +13,7 @@ import {
   PaginationNext,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
+import { useSession } from "next-auth/react";
 
 export default function AllStatsPage() {
   const [urls, setUrls] = useState([]);
@@ -24,6 +25,7 @@ export default function AllStatsPage() {
   const [showActive, setShowActive] = useState(true);
   const [showExpired, setShowExpired] = useState(true);
   const [page, setPage] = useState(1);
+  const { data: session } = useSession();
 
   const pageSize = 6;
 
@@ -97,6 +99,17 @@ export default function AllStatsPage() {
     );
   }
 
+  // Helper to determine link ownership
+  function getLinkType(url) {
+    if (session && url.owner && session.user && url.owner === session.user.email) {
+      return "My Link";
+    } else if (!url.owner) {
+      return "Anonymous";
+    } else {
+      return "Other";
+    }
+  }
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -126,11 +139,23 @@ export default function AllStatsPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-10">
-      <h1 className="text-4xl font-extrabold text-purple-700 mb-8 text-center tracking-tight drop-shadow">
+      <h1 className="text-4xl font-extrabold text-purple-700 mb-3 text-center tracking-tight drop-shadow">
         📈 All Link Stats
       </h1>
+      {/* Info Banner: Link Ownership */}
+      <div className="mb-6 flex flex-row items-center justify-center gap-4">
+        <div className="bg-purple-50 border border-purple-200 rounded-xl px-5 py-3 text-purple-800 text-sm font-medium shadow-sm max-w-2xl">
+          <span className="block mb-1">
+            <span className="font-bold">Anonymous links</span> are links you created without signing in. They are only visible to you on this device and will expire in 24 hours.
+          </span>
+          <span className="block">
+            <span className="font-bold">My links</span> are links you created while signed in. They are saved to your account and accessible from any device.
+          </span>
+        </div>
+      </div>
+
       {/* History/Filter Panel */}
-      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-8 bg-purple-50 border border-purple-100 rounded-xl p-4 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center gap-3 mb-8 bg-purple-50 border border-purple-100 rounded-xl p-5 shadow-sm">
         <input
           type="text"
           value={search}
@@ -161,13 +186,13 @@ export default function AllStatsPage() {
       </div>
 
       {urls.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16">
+        <div className="flex flex-col items-center justify-center py-20">
           <p className="text-center text-gray-500 text-lg">
             No shortened links found.
           </p>
         </div>
       ) : filteredUrls.length === 0 ? (
-        <div className="col-span-full flex flex-col items-center justify-center py-12">
+        <div className="col-span-full flex flex-col items-center justify-center py-20">
           <p className="text-center text-gray-400 text-lg font-semibold">
             No links found matching your search/filter.
           </p>
@@ -181,68 +206,74 @@ export default function AllStatsPage() {
                 className="group bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition flex flex-col justify-between h-full border border-purple-100 focus-within:ring-2 focus-within:ring-purple-400"
               >
                 <div className="mb-4 flex flex-col gap-2">
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      className="focus:outline-none"
-                      title="Click to preview large QR"
-                      onClick={() => setQrPreview(url.shortenedUrl)}
-                    >
-                      <QRCodeSVG
-                        value={`${window.location.origin}/s/${url.shortenedUrl}`}
-                        size={56}
-                        className="border border-purple-100 rounded-lg bg-white p-1 hover:scale-110 transition-transform"
-                      />
-                    </button>
-                    <div className="flex-1">
-                      <p className="text-xs text-gray-400 mb-1">
-                        Created:{" "}
-                        {url.createdAt
-                          ? new Date(url.createdAt).toLocaleString("en-IN")
-                          : "-"}
-                      </p>
+                  <div className="flex items-center gap-2 justify-between">
+                    <div className="flex items-center gap-2">
                       <button
                         type="button"
-                        title={url.originalUrl}
-                        onClick={() =>
-                          window.open(
-                            url.originalUrl,
-                            "_blank",
-                            "noopener,noreferrer"
-                          )
-                        }
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
+                        className="focus:outline-none"
+                        title="Click to preview large QR"
+                        onClick={() => setQrPreview(url.shortenedUrl)}
+                      >
+                        <QRCodeSVG
+                          value={`${window.location.origin}/s/${url.shortenedUrl}`}
+                          size={56}
+                          className="border border-purple-100 rounded-lg bg-white p-1 hover:scale-110 transition-transform"
+                        />
+                      </button>
+                      <div className="flex-1">
+                        <p className="text-xs text-gray-400 mb-1">
+                          Created: {url.createdAt ? new Date(url.createdAt).toLocaleString("en-IN") : "-"}
+                        </p>
+                        <button
+                          type="button"
+                          title={url.originalUrl}
+                          onClick={() =>
                             window.open(
                               url.originalUrl,
                               "_blank",
                               "noopener,noreferrer"
-                            );
+                            )
                           }
-                        }}
-                        className="font-semibold text-blue-700 hover:underline break-all text-left text-base focus:outline-none"
-                      >
-                        {highlightText(
-                          url.originalUrl.length > 60
-                            ? url.originalUrl.slice(0, 60) + "..."
-                            : url.originalUrl,
-                          search
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              window.open(
+                                url.originalUrl,
+                                "_blank",
+                                "noopener,noreferrer"
+                              );
+                            }
+                          }}
+                          className="font-semibold text-blue-700 hover:underline break-all text-left text-base focus:outline-none"
+                        >
+                          {highlightText(
+                            url.originalUrl.length > 60
+                              ? url.originalUrl.slice(0, 60) + "..."
+                              : url.originalUrl,
+                            search
+                          )}
+                        </button>
+                        <button
+                          type="button"
+                          className="ml-2 text-purple-500 hover:text-purple-800 text-xs border border-purple-100 rounded px-2 py-1"
+                          title="Copy original URL"
+                          onClick={() => handleCopyOriginal(url.originalUrl)}
+                        >
+                          Copy Original
+                        </button>
+                        {copiedSlug === url.originalUrl && (
+                          <span className="ml-1 text-green-600 text-xs">
+                            Copied!
+                          </span>
                         )}
-                      </button>
-                      <button
-                        type="button"
-                        className="ml-2 text-purple-500 hover:text-purple-800 text-xs border border-purple-100 rounded px-2 py-1"
-                        title="Copy original URL"
-                        onClick={() => handleCopyOriginal(url.originalUrl)}
-                      >
-                        Copy Original
-                      </button>
-                      {copiedSlug === url.originalUrl && (
-                        <span className="ml-1 text-green-600 text-xs">
-                          Copied!
-                        </span>
-                      )}
+                      </div>
                     </div>
+                    {/* Ownership badge */}
+                    <span
+                      className={`ml-4 px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap shadow-sm border ${getLinkType(url) === "My Link" ? "bg-green-100 text-green-700 border-green-200" : getLinkType(url) === "Anonymous" ? "bg-yellow-100 text-yellow-800 border-yellow-200" : "bg-gray-100 text-gray-500 border-gray-200"}`}
+                      title={getLinkType(url) === "My Link" ? "This link belongs to your account" : getLinkType(url) === "Anonymous" ? "This is an anonymous link (only visible on this device)" : "Other user's link"}
+                    >
+                      {getLinkType(url)}
+                    </span>
                   </div>
 
                   <div className="mt-2 flex items-center gap-2">

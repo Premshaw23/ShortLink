@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@auth/mongodb-adapter";
-import clientPromise from "@/lib/mongodb";
+import clientPromise from "@/lib/clientPromise";
 import { compare } from "bcryptjs";
 import { getUserByEmail } from "@/models/User";
 

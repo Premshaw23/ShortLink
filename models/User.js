@@ -3,7 +3,8 @@ import connectDb from "@/lib/mongodb";
 
 export async function getUserByEmail(email) {
   const db = await connectDb();
-  return db.collection("users").findOne({ email });
+  const user = await db.collection("users").findOne({ email });
+  return user;
 }
 
 export async function createUser({ email, password, name }) {

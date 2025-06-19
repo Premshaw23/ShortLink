@@ -3,6 +3,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { ClipboardCopy, Check, Eye, EyeOff, Sparkles } from "lucide-react";
+import { useSession } from "next-auth/react";
 
 const generatePassword = () => {
   // Simple strong password generator
@@ -15,6 +16,7 @@ const generatePassword = () => {
 };
 
 const ShortenPage = () => {
+  const { data: session } = useSession();
   const [originalUrl, setOriginalUrl] = useState("");
   const [customShortened, setCustomShortened] = useState("");
   const [expirationDateTime, setExpirationDateTime] = useState("");
@@ -92,6 +94,13 @@ const ShortenPage = () => {
       <h1 className="text-3xl font-extrabold text-center text-purple-700 mb-8 flex items-center justify-center gap-2 drop-shadow">
         <Sparkles className="text-purple-400" size={28} /> URL Shortener
       </h1>
+
+      <div className="mb-6 p-4 bg-purple-50 border-l-4 border-purple-400 rounded flex items-center gap-3">
+        <Sparkles className="text-purple-400" size={24} />
+        <span className="text-sm text-purple-900">
+          <b>Anonymous links</b> expire in <b>24 hours</b>. <b>Sign in</b> to manage your links, set custom expiration, and access analytics.
+        </span>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* Original URL */}
@@ -217,7 +226,8 @@ const ShortenPage = () => {
               min={new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
                 .toISOString()
                 .slice(0, 16)}
-              required
+              required={!!session}
+              disabled={!session}
             />
             {expirationDateTime && (
               <button
@@ -231,7 +241,9 @@ const ShortenPage = () => {
             )}
           </div>
           <p className="text-xs text-gray-500 mt-1">
-            Set the exact date and time when the link should expire.
+            {session
+              ? "Set the exact date and time when the link should expire."
+              : "Sign in to set a custom expiration. Anonymous links always expire in 24 hours."}
             {expirationDateTime &&
               new Date(expirationDateTime) < new Date() && (
                 <span className="text-red-600 font-semibold ml-2">

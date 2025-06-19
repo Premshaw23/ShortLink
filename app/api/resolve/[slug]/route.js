@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import connectDb from "@/lib/mongodb";
 import { ratelimit } from "@/lib/ratelimit";
 

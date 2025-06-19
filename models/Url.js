@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import connectDb from "../lib/mongodb";
 
 // Helper to get collection
@@ -15,7 +15,8 @@ export const createUrl = async (
   originalUrl,
   shortenedUrl,
   expiresAt,
-  password = null
+  password = null,
+  owner = null
 ) => {
   const urls = await getUrlCollection();
   const now = new Date();
@@ -34,6 +35,7 @@ export const createUrl = async (
       password: hashedPassword || null,
       clicks: 0,
       clickLogs: [],
+      owner: owner || null,
     });
 
     return { success: true, id: result.insertedId };
@@ -92,7 +94,6 @@ export const incrementClickCount = async (shortenedUrl, logData = null) => {
   await urls.updateOne({ shortenedUrl }, update);
 };
 
-
 // ✅ Get paginated URLs (optional frontend use)
 export const getUrlsPaginated = async (page = 1, limit = 10) => {
   const urls = await getUrlCollection();
@@ -102,4 +103,10 @@ export const getUrlsPaginated = async (page = 1, limit = 10) => {
     .skip((page - 1) * limit)
     .limit(limit)
     .toArray();
+};
+
+// ✅ Get URLs for a specific user
+export const getUserUrls = async (userId) => {
+  const urls = await getUrlCollection();
+  return await urls.find({ owner: userId }).sort({ createdAt: -1 }).toArray();
 };
