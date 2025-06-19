@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import connectDb from "../../../lib/mongodb";
-import { createUrl, findUrlByShortened } from "../../../models/Url";
+import { createUrl, findUrlByShortened, findUserUrlByShortened } from "../../../models/Url";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 
@@ -29,15 +29,6 @@ export async function POST(request) {
     const db = await connectDb();
 
     const shortened = customShortened || nanoid(8);
-
-    // Check for duplicate custom alias
-    const existingUrl = await findUrlByShortened(shortened);
-    if (existingUrl) {
-      return NextResponse.json(
-        { message: "Short link already exists. Try a different alias." },
-        { status: 400 }
-      );
-    }
 
     let expireAt = null;
     let session = null;
@@ -67,6 +58,16 @@ export async function POST(request) {
     }
     // Insert to DB
     const owner = session?.user?.email || null;
+
+    // Check for duplicate for this user only
+    const existingUserUrl = await findUserUrlByShortened(shortened, owner);
+    if (existingUserUrl) {
+      return NextResponse.json(
+        { message: "You already have a link with this short code. Try a different alias." },
+        { status: 400 }
+      );
+    }
+
     const inserted = await createUrl(normalizedUrl, shortened, expireAt, password, owner);
     if (!inserted.success) {
       return NextResponse.json({ message: inserted.message }, { status: inserted.status || 500 });

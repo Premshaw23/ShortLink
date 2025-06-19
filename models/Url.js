@@ -4,9 +4,11 @@ import connectDb from "../lib/mongodb";
 // Helper to get collection
 const getUrlCollection = async () => {
   const db = await connectDb();
+  // Remove old index in migration script, see below
+  // Ensure unique slug per owner (user or anonymous)
   await db
     .collection("urls")
-    .createIndex({ shortenedUrl: 1 }, { unique: true }); // Ensure unique slugs
+    .createIndex({ shortenedUrl: 1, owner: 1 }, { unique: true });
   return db.collection("urls");
 };
 
@@ -67,6 +69,19 @@ export const findUrlByShortened = async (shortenedUrl) => {
   const urls = await getUrlCollection();
   return await urls.findOne({
     shortenedUrl,
+    $or: [
+      { expiresAt: { $exists: false } },
+      { expiresAt: { $gt: new Date() } },
+    ],
+  });
+};
+
+// Find a single URL by shortened slug for a specific user (or anonymous)
+export const findUserUrlByShortened = async (shortenedUrl, owner) => {
+  const urls = await getUrlCollection();
+  return await urls.findOne({
+    shortenedUrl,
+    owner: owner || null,
     $or: [
       { expiresAt: { $exists: false } },
       { expiresAt: { $gt: new Date() } },
