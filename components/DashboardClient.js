@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Trash2, BarChart2, FileDown, Link2 } from "lucide-react";
 
 export default function DashboardClient({ urls, userEmail }) {
   const [search, setSearch] = useState("");
@@ -55,11 +56,13 @@ export default function DashboardClient({ urls, userEmail }) {
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by original URL or short link..."
           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-300 text-sm"
+          aria-label="Search links"
         />
         <button
           onClick={handleBulkDelete}
           disabled={selected.length === 0 || deleting}
-          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50"
+          className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold text-sm disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-red-400"
+          aria-label="Delete selected links"
         >
           Delete Selected
         </button>
@@ -80,9 +83,10 @@ export default function DashboardClient({ urls, userEmail }) {
             a.download = "my-links.csv";
             a.click();
           }}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm"
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-green-400 inline-flex items-center gap-1"
+          aria-label="Export links as CSV"
         >
-          Export CSV
+          <FileDown size={16} className="inline" aria-hidden="true" /> Export CSV
         </button>
       </div>
       <div className="mt-6">
@@ -91,13 +95,13 @@ export default function DashboardClient({ urls, userEmail }) {
           <p className="text-gray-500">No links yet. Create your first one!</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full text-sm text-left">
+            <table className="min-w-full text-sm text-left" aria-label="Your links table">
               <thead>
                 <tr>
-                  <th className="p-2 border-b"><input type="checkbox" onChange={e => setSelected(e.target.checked ? pagedUrls.map(u => u._id) : [])} checked={pagedUrls.length > 0 && pagedUrls.every(u => selected.includes(u._id))} /></th>
-                  <th className="p-2 border-b">Short Link</th>
+                  <th className="p-2 border-b"><input type="checkbox" onChange={e => setSelected(e.target.checked ? pagedUrls.map(u => u._id) : [])} checked={pagedUrls.length > 0 && pagedUrls.every(u => selected.includes(u._id))} aria-label="Select all links on page" /></th>
+                  <th className="p-2 border-b"><Link2 className="inline mr-1 text-purple-400" aria-hidden="true" />Short Link</th>
                   <th className="p-2 border-b">Original URL</th>
-                  <th className="p-2 border-b">Clicks</th>
+                  <th className="p-2 border-b"><BarChart2 className="inline mr-1 text-purple-400" aria-hidden="true" />Clicks</th>
                   <th className="p-2 border-b">Created</th>
                   <th className="p-2 border-b">Actions</th>
                 </tr>
@@ -105,19 +109,20 @@ export default function DashboardClient({ urls, userEmail }) {
               <tbody>
                 {pagedUrls.map((url, i) => (
                   <tr key={url._id} className={i % 2 === 0 ? "bg-purple-50" : ""}>
-                    <td className="p-2 border-b"><input type="checkbox" checked={selected.includes(url._id)} onChange={e => setSelected(e.target.checked ? [...selected, url._id] : selected.filter(id => id !== url._id))} /></td>
+                    <td className="p-2 border-b"><input type="checkbox" checked={selected.includes(url._id)} onChange={e => setSelected(e.target.checked ? [...selected, url._id] : selected.filter(id => id !== url._id))} aria-label={`Select link ${url.shortenedUrl}`} /></td>
                     <td className="p-2 border-b">
-                      <Link href={`/s/${url.shortenedUrl}`} className="text-purple-700 underline" target="_blank">
-                        /s/{url.shortenedUrl}
-                      </Link>
+                      <Link href={`/s/${url.shortenedUrl}`} className="text-purple-700 underline focus:outline-none focus:ring-2 focus:ring-purple-400" target="_blank" aria-label={`Open short link /s/${url.shortenedUrl}`}>/s/{url.shortenedUrl}</Link>
                     </td>
-                    <td className="p-2 border-b truncate max-w-xs">{url.originalUrl}</td>
+                    <td className="p-2 border-b truncate max-w-xs" title={url.originalUrl}>{url.originalUrl}</td>
                     <td className="p-2 border-b">{url.clicks || 0}</td>
                     <td className="p-2 border-b">{url.createdAt ? new Date(url.createdAt).toISOString().slice(0, 10) : "-"}</td>
                     <td className="p-2 border-b">
-                      <button onClick={() => handleDelete(url._id)} className="text-red-600 hover:underline mr-2" disabled={deleting}>Delete</button>
-                      {/* Future: Edit button */}
-                      <Link href={`/stats/${url.shortenedUrl}`} className="text-blue-600 hover:underline mr-2">Analytics</Link>
+                      <button onClick={() => handleDelete(url._id)} className="text-red-600 hover:underline mr-2 focus:outline-none focus:ring-2 focus:ring-red-400 inline-flex items-center gap-1" disabled={deleting} aria-label={`Delete link /s/${url.shortenedUrl}`}>
+                        <Trash2 size={16} className="inline" aria-hidden="true" /> Delete
+                      </button>
+                      <Link href={`/stats/${url.shortenedUrl}`} className="text-blue-600 hover:underline mr-2 focus:outline-none focus:ring-2 focus:ring-blue-400 inline-flex items-center gap-1" aria-label={`View analytics for /s/${url.shortenedUrl}`}>
+                        <BarChart2 size={16} className="inline" aria-hidden="true" /> Analytics
+                      </Link>
                     </td>
                   </tr>
                 ))}

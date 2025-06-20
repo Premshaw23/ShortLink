@@ -31,7 +31,7 @@ const RedirectPage = ({ params }) => {
         }
         if (!res.ok) {
           toast.error(data.message || "Invalid or expired link.");
-          setTimeout(() => router.replace("/expired"), 1500);
+          router.replace("/expired");
           return;
         }
         if (data.passwordProtected) {
