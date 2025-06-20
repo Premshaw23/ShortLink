@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { nanoid } from "nanoid";
 import connectDb from "../../../lib/mongodb";
-import { createUrl, findUrlByShortened, findUserUrlByShortened } from "../../../models/Url";
+import { createUrl, findUrlByShortened } from "../../../models/Url";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]/route";
 
@@ -59,11 +59,11 @@ export async function POST(request) {
     // Insert to DB
     const owner = session?.user?.email || null;
 
-    // Check for duplicate for this user only
-    const existingUserUrl = await findUserUrlByShortened(shortened, owner);
-    if (existingUserUrl) {
+    // Check for duplicate alias globally
+    const existingUrl = await findUrlByShortened(shortened);
+    if (existingUrl) {
       return NextResponse.json(
-        { message: "You already have a link with this short code. Try a different alias." },
+        { message: "Short link already exists. Try a different alias." },
         { status: 400 }
       );
     }

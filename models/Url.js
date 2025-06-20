@@ -4,11 +4,10 @@ import connectDb from "../lib/mongodb";
 // Helper to get collection
 const getUrlCollection = async () => {
   const db = await connectDb();
-  // Remove old index in migration script, see below
-  // Ensure unique slug per owner (user or anonymous)
+  // Ensure global unique slug (alias)
   await db
     .collection("urls")
-    .createIndex({ shortenedUrl: 1, owner: 1 }, { unique: true });
+    .createIndex({ shortenedUrl: 1 }, { unique: true });
   return db.collection("urls");
 };
 
