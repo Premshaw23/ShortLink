@@ -34,10 +34,17 @@ const ShortenPage = () => {
       return;
     }
 
+    let expirationDateTimeUTC = "";
+    if (expirationDateTime) {
+      // Convert local datetime-local input to UTC ISO string
+      const dt = new Date(expirationDateTime);
+      expirationDateTimeUTC = dt.toISOString();
+    }
+
     const data = {
       originalUrl,
       customShortened,
-      expirationDateTime, // send ISO string
+      expirationDateTime: expirationDateTimeUTC,
       password,
     };
 
