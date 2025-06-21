@@ -1,7 +1,6 @@
 import bcrypt from "bcryptjs";
 import connectDb from "../lib/mongodb";
 
-// Helper to get collection
 const getUrlCollection = async () => {
   const db = await connectDb();
   // Ensure global unique slug (alias)
