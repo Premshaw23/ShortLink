@@ -18,9 +18,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "ShortLink – Simple & Private URL Shortener",
+  title: "ShortLink - Privacy-First URL Shortener",
   description:
-    "Shorten your long URLs quickly with ShortLink. No sign-up, no tracking — just clean, fast, and customizable links.",
+    "Shorten URLs with privacy, analytics, and no tracking. Free, open source, and secure URL shortener.",
 };
 
 export default function RootLayout({ children }) {
