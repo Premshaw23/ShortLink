@@ -12,9 +12,11 @@ export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    showConsentBanner = () => setVisible(true);
-    return () => { showConsentBanner = null; };
-  }, []);
+  showConsentBanner = () => setVisible(true);
+  const consent = localStorage.getItem("cookie_consent");
+  if (!consent) setVisible(true);
+  return () => { showConsentBanner = null; };
+}, []);
 
   const handleConsent = (accepted) => {
     localStorage.setItem("cookie_consent", accepted ? "accepted" : "declined");
