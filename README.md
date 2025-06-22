@@ -90,7 +90,7 @@ npm run dev
 ### ℹ️ Implementation Notes
 
 - **Toast Notifications:**
-  - Use a notification library (e.g., [react-hot-toast](https://react-hot-toast.com/) or [sonner](https://sonner.emilkowal.ski/)) to provide real-time feedback for all async actions (create, delete, sign in, sign up, password reset, etc.).
+  - Use a notification library (e.g., [react-hot-toast](https://react-hot-toast.com/) to provide real-time feedback for all async actions (create, delete, sign in, sign up, password reset, etc.).
   - Integrate toasts in Dashboard, Auth, and Account pages for success/error states.
 
 - **Empty State Illustrations:**
