@@ -30,14 +30,15 @@ export async function POST(request) {
 
     const shortened = customShortened || nanoid(8);
 
-    let expireAt = null;
+    let expiresAt = null;
     let session = null;
     try {
       session = await getServerSession(authOptions);
     } catch {}
+
     if (!session?.user?.email) {
       // Anonymous: always expire in 1 day, ignore user-provided expiration
-      expireAt = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
+      expiresAt = new Date(Date.now() + 1 * 24 * 60 * 60 * 1000);
       if (expirationDateTime) {
         return NextResponse.json(
           { message: "Sign in to set a custom expiration date/time." },
@@ -45,8 +46,20 @@ export async function POST(request) {
         );
       }
     } else if (expirationDateTime) {
-      expireAt = new Date(expirationDateTime);
-      if (isNaN(expireAt.getTime()) || expireAt < new Date()) {
+      // User provided custom expiration
+      expiresAt = new Date(expirationDateTime);
+
+      // Validate the date
+      if (isNaN(expiresAt.getTime())) {
+        return NextResponse.json(
+          { message: "Invalid expiration date/time format." },
+          { status: 400 }
+        );
+      }
+
+      // Check if date is in the future (with 1 minute buffer to avoid timing issues)
+      const now = new Date();
+      if (expiresAt.getTime() <= now.getTime()) {
         return NextResponse.json(
           { message: "Expiration date/time must be in the future." },
           { status: 400 }
@@ -54,10 +67,8 @@ export async function POST(request) {
       }
     } else {
       // Logged in, default to 7 days
-      expireAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     }
-    // Insert to DB
-    const owner = session?.user?.email || null;
 
     // Check for duplicate alias globally
     const existingUrl = await findUrlByShortened(shortened);
@@ -68,9 +79,22 @@ export async function POST(request) {
       );
     }
 
-    const inserted = await createUrl(normalizedUrl, shortened, expireAt, password, owner);
+    const owner = session?.user?.email || null;
+
+    // Insert to DB - make sure expiresAt is passed correctly
+    const inserted = await createUrl(
+      normalizedUrl,
+      shortened,
+      expiresAt, // Changed from expireAt to expiresAt
+      password,
+      owner
+    );
+
     if (!inserted.success) {
-      return NextResponse.json({ message: inserted.message }, { status: inserted.status || 500 });
+      return NextResponse.json(
+        { message: inserted.message },
+        { status: inserted.status || 500 }
+      );
     }
 
     const shortenedUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/s/${shortened}`;

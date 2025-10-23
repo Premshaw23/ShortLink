@@ -1,24 +1,15 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import connectDb from "@/lib/mongodb";
-import { ratelimit } from "@/lib/ratelimit";
-
 
 export async function GET(req, { params }) {
   const { slug } = await params;
+
   // Extract IP from request
   const ip =
     (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() ||
+    req.headers.get("x-real-ip") ||
     "unknown";
-
-  const { success } = await ratelimit.limit(ip);
-
-  if (!success) {
-    return NextResponse.json(
-      { message: "Too many requests. Please try again later." },
-      { status: 429 }
-    );
-  }
 
   const db = await connectDb();
   const collection = db.collection("urls");
@@ -29,8 +20,14 @@ export async function GET(req, { params }) {
     return NextResponse.json({ message: "Link not found" }, { status: 404 });
   }
 
-  if (link.expiresAt && new Date(link.expiresAt) < new Date()) {
-    return NextResponse.json({ message: "Link expired" }, { status: 410 });
+  // Check expiration
+  if (link.expiresAt) {
+    const expirationDate = new Date(link.expiresAt);
+    const now = new Date();
+
+    if (expirationDate <= now) {
+      return NextResponse.json({ message: "Link expired" }, { status: 410 });
+    }
   }
 
   if (link.password) {
@@ -45,37 +42,34 @@ export async function GET(req, { params }) {
         $inc: { clicks: 1 },
         $push: {
           clickLogs: {
-            $each: [{
-              timestamp: new Date(),
-              ip,
-              userAgent: req.headers.get("user-agent") || "unknown",
-            }],
-            $slice: -100, // Optional: Keep only last 100 logs
+            $each: [
+              {
+                timestamp: new Date(),
+                ip,
+                userAgent: req.headers.get("user-agent") || "unknown",
+              },
+            ],
+            $slice: -100,
           },
         },
       }
     );
-  
+
     return NextResponse.json({
       passwordProtected: false,
       originalUrl: link.originalUrl,
     });
   }
-}  
+}
 
 export async function POST(req, { params }) {
   const { slug } = await params;
-  // Extract IP from request
-  const ip = req.headers.get("x-forwarded-for") || "unknown";
 
-  const { success } = await ratelimit.limit(ip);
-
-  if (!success) {
-    return NextResponse.json(
-      { message: "Too many requests. Please try again later." },
-      { status: 429 }
-    );
-  }
+  // Extract IP from request - FIXED: Uncommented and improved
+  const ip =
+    (req.headers.get("x-forwarded-for") || "").split(",")[0].trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
 
   const { password } = await req.json();
 
@@ -89,14 +83,20 @@ export async function POST(req, { params }) {
   const db = await connectDb();
   const collection = db.collection("urls");
 
-  const link = await collection.findOne({ shortenedUrl: slug }); // FIXED
+  const link = await collection.findOne({ shortenedUrl: slug });
 
   if (!link) {
     return NextResponse.json({ message: "Link not found" }, { status: 404 });
   }
 
-  if (link.expiresAt && new Date(link.expiresAt) < new Date()) {
-    return NextResponse.json({ message: "Link expired" }, { status: 410 });
+  // Check expiration
+  if (link.expiresAt) {
+    const expirationDate = new Date(link.expiresAt);
+    const now = new Date();
+
+    if (expirationDate <= now) {
+      return NextResponse.json({ message: "Link expired" }, { status: 410 });
+    }
   }
 
   if (!link.password) {
@@ -128,13 +128,11 @@ export async function POST(req, { params }) {
               userAgent: req.headers.get("user-agent") || "unknown",
             },
           ],
-          $slice: -100, // Optional: Keep only last 100 logs
+          $slice: -100,
         },
       },
     }
   );
-  
 
   return NextResponse.json({ originalUrl: link.originalUrl });
-  
 }
